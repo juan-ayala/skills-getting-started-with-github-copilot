@@ -1,7 +1,8 @@
 import pytest
 from pytest_bdd import scenario, given, when, then, parsers
 from fastapi.testclient import TestClient
-from src.app import app, activities
+from src.app import app
+import src.app
 
 # Test client fixture
 @pytest.fixture
@@ -16,8 +17,7 @@ def context():
 # Reset activities fixture
 @pytest.fixture(autouse=True)
 def reset_activities():
-    global activities
-    activities = {
+    src.app.activities = {
         "Chess Club": {
             "description": "Learn strategies and compete in chess tournaments",
             "schedule": "Fridays, 3:30 PM - 5:00 PM",
@@ -130,7 +130,7 @@ def step_signup_success(context):
 
 @then(parsers.parse('"{email}" should be added to "{activity}" participants'))
 def step_added_to_participants(email, activity):
-    assert email in activities[activity]['participants']
+    assert email in src.app.activities[activity]['participants']
 
 @then(parsers.parse('the signup should fail with {status_code}'))
 def step_signup_fail(context, status_code):
@@ -157,7 +157,7 @@ def step_unregister_success(context):
 
 @then(parsers.parse('"{email}" should be removed from "{activity}" participants'))
 def step_removed_from_participants(email, activity):
-    assert email not in activities[activity]['participants']
+    assert email not in src.app.activities[activity]['participants']
 
 @then(parsers.parse('the unregister should fail with {status_code}'))
 def step_unregister_fail(context, status_code):
